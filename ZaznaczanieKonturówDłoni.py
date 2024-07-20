@@ -26,16 +26,18 @@ def ModifyImage(Frame:np.ndarray, threshold:int = 120) -> np.ndarray:
                                    type = cv2.THRESH_BINARY)
     
 
-    #Zmień wymiary ramki.
-    bin_frame = cv2.resize(src = bin_frame, 
-                            dsize = (window_width, window_height))
     
-    
-
     return bin_frame
         
 
+def NarysujKontury(Frame:np.ndarray, color:tuple[int], threshold:int = 120):
+    bin_frame:np.ndarray =  ModifyImage(Frame)
+    kontury, hierarchia = cv2.findContours(image = bin_frame, mode = cv2.RETR_TREE, method = cv2.CHAIN_APPROX_SIMPLE)
 
+    frame_copy:np.ndarray = Frame.copy()
+    
+    contoured_obraz = cv2.drawContours(image = frame_copy, contours = kontury, contourIdx = -1, color = color, thickness = 3)
+    cv2.imshow(winname = "Obraz z konturami", mat = contoured_obraz)
 
 
 
@@ -50,16 +52,10 @@ while(True):
 
     if ret:
 
-
-        bin_frame = ModifyImage(Frame = frame, threshold = 150)
-
-        kontury, hierarchia = cv2.findContours(image = bin_frame,  mode = cv2.RETR_EXTERNAL,  method = cv2.CHAIN_APPROX_NONE)
         
-        frame_copy:np.ndarray = frame.copy()
-        obraz = cv2.drawContours(image = frame_copy,  contours = kontury, contourIdx = -1,  color = (0,255 ,0))
-
-        cv2.imshow(winname = "Piwo", mat = obraz)
-        cv2.resizeWindow(winname = "Piwo", width = window_width, height = window_height)
+        NarysujKontury(frame, color = [120, 0, 0], threshold = 120)
+        
+        cv2.resizeWindow(winname = "Obraz z konturami", width = frame.shape[1], height = frame.shape[0])
     
         
     else:
